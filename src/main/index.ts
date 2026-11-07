@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { session } from 'electron' // add to the existing electron import
+import { bindSmartSpectraIpc } from '@smartspectra/node-sdk/main'
 
 function createWindow(): void {
   // Create the browser window.
@@ -15,6 +17,13 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
+  })
+  bindSmartSpectraIpc(mainWindow)
+
+  session.defaultSession.setPermissionRequestHandler((wc, permission, cb, details) => {
+    const url = details?.requestingUrl || wc.getURL()
+    const ownPage = url.startsWith('file://') || url.startsWith('http://localhost')
+    cb(permission === 'media' && ownPage) // camera only, only for our own page
   })
 
   mainWindow.on('ready-to-show', () => {

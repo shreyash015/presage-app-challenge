@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import '@smartspectra/node-sdk/preload'
 
 // Custom APIs for renderer
 const api = {}
