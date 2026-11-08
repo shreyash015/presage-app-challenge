@@ -1,0 +1,697 @@
+/* Aurae design tokens + component recipes (from the Aurae design system). */
+
+:root {
+  --ground: #f3f3f1;
+  --ground-dot: #d9d9d4;
+  --panel: #fafaf8;
+  --chip: #e8e8e4;
+  --line: #e1e1dc;
+  --line-strong: #b9b9b3;
+  --ink: #1c1c1a;
+  --ink-muted: #64645f;
+  --ink-faint: #8a8a85;
+  --lime: #d6f21e;
+  --lime-edge: #6f8a05;
+  --lime-halo: rgba(214, 242, 30, 0.22);
+  --on-card: #ffffff;
+  --on-card-muted: rgba(255, 255, 255, 0.82);
+  --card-line: rgba(255, 255, 255, 0.72);
+  --card-glass: rgba(28, 28, 26, 0.36);
+  --sage-deep: #2f5d3a;
+  --sage: #5f9a5c;
+  --sage-mist: #a9c69a;
+  --amber-deep: #8a6431;
+  --amber: #d9a347;
+  --citron: #dcc43a;
+  --coral-deep: #8c5644;
+  --coral: #df8d68;
+  --slate-deep: #4c6475;
+  --slate: #7d95a5;
+  --taupe-deep: #6b5f55;
+  --taupe: #b5a593;
+  --focus: var(--ink);
+  --space-gutter: 6px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+  --shadow-tile: 0 1px 2px rgba(28, 28, 26, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-halo: 0 0 18px rgba(214, 242, 30, 0.45);
+  --font-sans: 'Urbanist', system-ui, sans-serif;
+}
+
+.display-xl {
+  font-family: var(--font-sans);
+  font-size: 72px;
+  line-height: 72px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.display {
+  font-family: var(--font-sans);
+  font-size: 52px;
+  line-height: 54px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.metric {
+  font-family: var(--font-sans);
+  font-size: 44px;
+  line-height: 44px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+.metric-sm {
+  font-family: var(--font-sans);
+  font-size: 34px;
+  line-height: 36px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.scale-label {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 300;
+}
+.title {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 400;
+}
+.label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+}
+.micro {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Aurae component styles. Every value comes from tokens.css (var(--…)); nothing is hard-coded but geometry. */
+
+.au-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- focus ---------- */
+.au-focusable:focus-visible,
+.au-btn:focus-visible,
+.au-tile:focus-visible,
+.au-rail button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- grain: the soft film texture on every gradient card ---------- */
+.au-grain {
+  position: relative;
+  isolation: isolate;
+}
+.au-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ---------- MetricCard ---------- */
+.au-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  color: var(--on-card);
+  padding: var(--space-6);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.au-card > * {
+  position: relative;
+  z-index: 1;
+}
+.au-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.au-card__label {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--on-card-muted);
+}
+.au-card__value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+}
+.au-card__unit {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--on-card-muted);
+}
+.au-card__delta {
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 300;
+}
+.au-card__delta small {
+  font-size: 13px;
+  color: var(--on-card-muted);
+  margin-left: 2px;
+}
+.au-card__arrow {
+  width: 16px;
+  height: 16px;
+  stroke: var(--on-card);
+  fill: none;
+  stroke-width: 1.25;
+  flex: none;
+}
+.au-card__art {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.au-card__foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.au-card--pulse {
+  background:
+    radial-gradient(
+      55% 30% at 50% 58%,
+      color-mix(in srgb, var(--amber) 45%, transparent) 0%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      var(--sage-deep) 0%,
+      var(--sage) 36%,
+      var(--sage-mist) 60%,
+      var(--sage) 100%
+    );
+}
+.au-card--breath {
+  background:
+    radial-gradient(
+      45% 55% at 92% 8%,
+      color-mix(in srgb, var(--coral) 35%, transparent) 0%,
+      transparent 100%
+    ),
+    linear-gradient(
+      155deg,
+      var(--taupe-deep) 0%,
+      var(--taupe-deep) 14%,
+      var(--taupe) 36%,
+      var(--amber) 64%,
+      var(--citron) 100%
+    );
+}
+.au-card--hrv {
+  background:
+    radial-gradient(
+      50% 40% at 70% 22%,
+      color-mix(in srgb, var(--coral) 70%, transparent) 0%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      var(--coral-deep) 0%,
+      var(--coral-deep) 12%,
+      var(--coral) 34%,
+      var(--slate) 68%,
+      var(--slate-deep) 100%
+    );
+}
+.au-card--readings {
+  background:
+    radial-gradient(
+      60% 50% at 35% 70%,
+      color-mix(in srgb, var(--amber) 80%, transparent) 0%,
+      transparent 100%
+    ),
+    linear-gradient(
+      165deg,
+      var(--amber-deep) 0%,
+      var(--amber-deep) 16%,
+      var(--amber) 50%,
+      var(--taupe) 100%
+    );
+}
+.au-card--blinks {
+  background:
+    radial-gradient(
+      55% 45% at 60% 75%,
+      color-mix(in srgb, var(--sage-mist) 70%, transparent) 0%,
+      transparent 100%
+    ),
+    linear-gradient(
+      165deg,
+      var(--taupe-deep) 0%,
+      var(--taupe-deep) 14%,
+      var(--taupe) 42%,
+      var(--sage) 100%
+    );
+}
+
+/* line art */
+.au-art-lines {
+  fill: none;
+  stroke: var(--card-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.au-art-dot {
+  fill: var(--lime);
+  filter: drop-shadow(0 0 6px var(--lime));
+}
+.au-art-dot--white {
+  fill: var(--on-card);
+  filter: none;
+}
+.au-art-tick {
+  fill: var(--on-card-muted);
+}
+
+/* ---------- StatusChip ---------- */
+.au-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--chip);
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.au-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--lime);
+  box-shadow: 0 0 0 1px var(--lime-edge);
+}
+.au-chip--paused .au-chip__dot {
+  background: var(--ink-faint);
+  box-shadow: none;
+}
+.au-chip--glass {
+  background: var(--card-glass);
+  color: var(--on-card);
+  backdrop-filter: blur(6px);
+}
+.au-chip--glass .au-chip__dot {
+  box-shadow: none;
+}
+
+/* ---------- IconTile & SideRail ---------- */
+.au-tile {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  background: var(--chip);
+  color: var(--ink);
+  box-shadow: var(--shadow-tile);
+}
+.au-tile svg,
+.au-rail svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.au-tile[aria-pressed='false'] {
+  color: var(--ink-muted);
+}
+.au-rail {
+  display: inline-flex;
+  flex-direction: column;
+  border-radius: var(--radius-sm);
+  background: var(--chip);
+  box-shadow: var(--shadow-tile);
+  overflow: hidden;
+}
+.au-rail button {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.au-rail button[aria-current='true'] {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* ---------- Signal dot + callout ---------- */
+.au-signal {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--lime-halo);
+  display: grid;
+  place-items: center;
+}
+.au-signal::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--lime);
+  box-shadow:
+    0 0 0 1px var(--lime-edge),
+    var(--shadow-halo);
+}
+
+.au-callout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  column-gap: 0;
+}
+.au-callout__body {
+  padding-left: var(--space-3);
+  border-top: 1px solid var(--line-strong);
+  padding-top: var(--space-2);
+  min-width: 150px;
+}
+.au-callout__value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+.au-callout__value .au-faint {
+  color: var(--ink-faint);
+  font-size: 24px;
+  font-weight: 300;
+}
+.au-callout__unit {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.au-callout__label {
+  margin: 2px 0 6px;
+}
+.au-callout__lead {
+  width: 56px;
+  height: 1px;
+  background: var(--line-strong);
+  margin-bottom: 15px;
+}
+.au-callout--flip {
+  grid-template-columns: 1fr auto;
+}
+.au-callout--flip .au-callout__body {
+  padding-left: 0;
+  padding-right: var(--space-3);
+  text-align: left;
+}
+
+/* ---------- RangeScale labels (art comes from the arcs motif) ---------- */
+.au-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.au-scale-labels span {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--on-card);
+  font-weight: 400;
+}
+.au-scale-labels span[aria-current='true'] {
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 300;
+}
+.au-scale-labels--large span {
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 300;
+}
+.au-scale-labels--large span[aria-current='true'] {
+  font-weight: 500;
+}
+.au-scale-labels--large span[aria-current='true']::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  margin: 0 auto 8px;
+  border-radius: var(--radius-full);
+  background: var(--on-card);
+}
+
+/* ---------- Session timeline ---------- */
+.au-timeline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--panel);
+  border-radius: var(--radius-sm);
+  padding: 10px var(--space-4);
+  box-shadow: var(--shadow-tile);
+}
+.au-timeline__title {
+  font-size: 15px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.au-timeline__track {
+  position: relative;
+  flex: 1;
+  height: 44px;
+}
+.au-timeline__band {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  border-radius: var(--radius-xs);
+  background: linear-gradient(
+    90deg,
+    var(--sage-mist) 0%,
+    color-mix(in srgb, var(--sage) 55%, var(--sage-mist)) 100%
+  );
+  border-left: 2px solid var(--lime-edge);
+  border-right: 2px solid var(--lime-edge);
+}
+.au-timeline__tick {
+  position: absolute;
+  bottom: 6px;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  transform: translateX(-50%);
+}
+.au-timeline__tick::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 1px;
+  height: 4px;
+  background: var(--ink);
+}
+.au-timeline__tick--future {
+  color: var(--ink-muted);
+}
+.au-timeline__tick--future::after {
+  background: var(--line-strong);
+}
+.au-timeline__mark {
+  position: absolute;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--panel);
+  transform: translateX(-50%);
+}
+.au-timeline__now {
+  position: absolute;
+  top: 6px;
+  transform: translateX(-50%);
+  background: var(--lime);
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  padding: 0 5px;
+  border-radius: var(--radius-xs);
+}
+
+/* ---------- Buttons ---------- */
+.au-btn {
+  font: inherit;
+  font-size: 15px;
+  height: 40px;
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+.au-btn--primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--panel);
+}
+
+/* ---------- Hero panel + camera mist ---------- */
+.au-hero {
+  position: relative;
+  background-color: var(--panel);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-image: radial-gradient(var(--ground-dot) 1px, transparent 1.2px);
+  background-size: 12px 12px;
+}
+.au-camera {
+  position: absolute;
+  overflow: hidden;
+}
+.au-camera video,
+.au-camera .au-mist-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.08) brightness(1.04);
+  -webkit-mask-image: radial-gradient(ellipse 58% 72% at 50% 42%, #000 46%, transparent 86%);
+  mask-image: radial-gradient(ellipse 58% 72% at 50% 42%, #000 46%, transparent 86%);
+}
+.au-camera::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, var(--panel) 100%);
+  pointer-events: none;
+}
+
+/* ---------- Consent ---------- */
+.au-consent {
+  width: 440px;
+  background: var(--panel);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-tile);
+  padding: var(--space-8);
+  box-sizing: border-box;
+}
+.au-consent h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.au-consent p,
+.au-consent li {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-muted);
+}
+.au-consent ul {
+  padding-left: 18px;
+  margin: var(--space-4) 0;
+}
+.au-consent strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.au-consent label {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink);
+  margin: var(--space-6) 0;
+}
+.au-consent input {
+  accent-color: var(--ink);
+  margin-top: 2px;
+}
+.au-consent__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ---------- Small screens ----------
+   These recipes are plain CSS (not Tailwind utilities), so Tailwind's `sm:` classes can't resize
+   them; scale the big type down here instead. */
+@media (max-width: 639px) {
+  .display-xl {
+    font-size: 52px;
+    line-height: 54px;
+  }
+  .display {
+    font-size: 40px;
+    line-height: 42px;
+  }
+  .metric {
+    font-size: 36px;
+    line-height: 38px;
+  }
+  .au-card {
+    padding: var(--space-4) var(--space-6);
+  }
+  .au-consent {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
