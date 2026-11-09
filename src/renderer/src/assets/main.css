@@ -4,7 +4,7 @@
 /* Map Aurae tokens into Tailwind utilities (bg-ground, text-ink, rounded-card, …).
    `inline` keeps aurae.css as the single source of every value. */
 @theme inline {
-  --font-sans: 'Urbanist', system-ui, sans-serif;
+  --font-sans: 'Urbanist Variable', 'Urbanist', system-ui, sans-serif;
   --color-ground: var(--ground);
   --color-ground-dot: var(--ground-dot);
   --color-panel: var(--panel);

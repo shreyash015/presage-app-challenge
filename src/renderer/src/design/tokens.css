@@ -1,6 +1,6 @@
 /*
- * Aurae v2 design tokens — PROTOTYPE.
- * Scoped to `.aurae-v2` so they cannot affect the live screen (aurae.css stays the source there).
+ * Aurae v2 design tokens.
+ * Scoped to `.aurae-v2` (the consent screen's root) so the older aurae.css recipes are unaffected.
  * Every text/background pair below is contrast-checked; see the design spec for the figures.
  */
 

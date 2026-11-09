@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * AtmosCard — PROTOTYPE metric preview card.
+ * AtmosCard — metric preview card.
  * One atmosphere (gradient family) + one line-art form per reading. The art is decorative and
  * carries no data: no values, scales or classifications are shown until the camera is on.
  */

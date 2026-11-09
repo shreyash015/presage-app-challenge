@@ -6,10 +6,20 @@ import ConsentScreen from './components/ConsentScreen.vue'
 import { useVitals } from './composables/useVitals'
 
 const consented = ref(false)
+const startError = ref<string | null>(null)
 
-async function onAccept() {
-  consented.value = true
-  await start() // camera turns on only here
+// The consent screen stays up (showing "Starting camera…") until the camera has started,
+// so a failure can be shown there instead of on a blank page.
+async function onAccept(): Promise<void> {
+  startError.value = null
+  try {
+    await start() // camera turns on only here
+    consented.value = true
+  } catch (e) {
+    console.error('Aurae: camera start failed', e)
+    startError.value =
+      'Aurae couldn’t start the camera. Allow camera access for Aurae in System Settings › Privacy & Security › Camera, then try again.'
+  }
 }
 
 const { videoEl, pulse, breathing, hint, running, start, stop } = useVitals()
@@ -18,7 +28,13 @@ const beat = computed(() => (pulse.value ? 60 / pulse.value : 1))
 
 <template>
   <!-- The consent screen is a full page of its own, so it is not wrapped in the session layout -->
-  <ConsentScreen v-if="!consented" @accept="onAccept" @decline="consented = false" />
+  <!-- "Not now" (decline) still has no destination: see the readiness report, item A5 -->
+  <ConsentScreen
+    v-if="!consented"
+    :error="startError"
+    @accept="onAccept"
+    @decline="consented = false"
+  />
   <main
     v-else
     class="min-h-dvh bg-slate-950 text-slate-100 flex flex-col items-center justify-center gap-6 p-4 sm:p-8"

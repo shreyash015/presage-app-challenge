@@ -1,5 +1,5 @@
 /**
- * Aurae v2 motion tokens — PROTOTYPE.
+ * Aurae v2 motion tokens.
  * The same values as the CSS custom properties in tokens.css, for Motion (motion-v) animations.
  */
 

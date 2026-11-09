@@ -12,15 +12,6 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [vue(), tailwindcss()],
-    build: {
-      rollupOptions: {
-        input: {
-          index: resolve('src/renderer/index.html'),
-          // Consent-screen redesign prototype; only opened with AURAE_PROTOTYPE=1 (see src/main/index.ts)
-          prototype: resolve('src/renderer/prototype.html')
-        }
-      }
-    }
+    plugins: [vue(), tailwindcss()]
   }
 })

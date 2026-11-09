@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * OrbitMotif — PROTOTYPE of the hero visualization.
+ * OrbitMotif — the hero visualization.
  * Same geometry and gentle motion as the live orbit, refined:
  *  - hairline strokes that stay 0.75px at any size (vector-effect: non-scaling-stroke)
  *  - every animated SVG element has tabindex="-1" (motion-v's focus listeners made them tab stops)
@@ -9,7 +9,7 @@
  */
 import { computed, ref } from 'vue'
 import { motion, useReducedMotion, useMotionValue, useSpring, useTransform } from 'motion-v'
-import { duration, ease, softSpring } from './motion'
+import { duration, ease, softSpring } from '../design/motion'
 
 defineProps<{ callout?: boolean }>()
 
