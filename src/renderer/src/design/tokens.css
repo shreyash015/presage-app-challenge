@@ -1,0 +1,240 @@
+/*
+ * Aurae v2 design tokens.
+ * Scoped to `.aurae-v2` (the consent screen's root) so the older aurae.css recipes are unaffected.
+ * Every text/background pair below is contrast-checked; see the design spec for the figures.
+ */
+
+.aurae-v2 {
+  /* ---------- Color: surfaces ---------- */
+  --c-canvas: #f2f0eb; /* warm off-white page */
+  --c-canvas-dot: #d5d1c7; /* dotted texture */
+  --c-panel: #faf9f6; /* reading surfaces */
+  --c-raised: #ebe9e3; /* chips, quiet fills */
+
+  /* ---------- Color: ink ---------- */
+  --c-ink: #1b1b19; /* primary text, primary button */
+  --c-ink-2: #55544e; /* secondary text */
+  --c-ink-3: #6b6a63; /* tertiary text, still ≥ 4.5:1 on panel */
+  --c-on-atmos: #ffffff; /* text on gradients */
+  --c-on-atmos-2: rgba(255, 255, 255, 0.88);
+
+  /* ---------- Color: lines ---------- */
+  --c-hairline: #e2dfd7; /* dividers, never a control edge */
+  --c-control: #8a877f; /* control borders, ≥ 3:1 on panel */
+  --c-geometry: rgba(27, 27, 25, 0.24); /* line art on the canvas */
+  --c-geometry-atmos: rgba(255, 255, 255, 0.72); /* line art on gradients */
+
+  /* ---------- Color: signal (chartreuse is reserved for these) ---------- */
+  --c-signal: #d4f01c;
+  --c-signal-edge: #5f7a00;
+  --c-signal-halo: rgba(212, 240, 28, 0.24);
+  --c-focus: #1b1b19;
+  --c-notice: #8a4529; /* inline guidance, ≥ 4.5:1 on panel */
+
+  /* ---------- Color: data palette (only inside atmospheres) ---------- */
+  --c-forest: #2c5a37;
+  --c-sage: #5e9659;
+  --c-sage-mist: #a8c497;
+  --c-champagne: #e8d6b4;
+  --c-amber: #d6a04a;
+  --c-citron: #d9c43b;
+  --c-coral: #dd8c67;
+  --c-coral-deep: #874f3d;
+  --c-slate: #7a93a4;
+  --c-slate-deep: #465e6f;
+  --c-taupe: #b3a491;
+  --c-taupe-deep: #665a50;
+
+  /* ---------- Atmospheres: four gradient families ----------
+     Each is layered: a deep "anchor" at the top (where labels sit, so white text passes),
+     a soft colour bloom in the middle, a lighter ground at the bottom. */
+  --atmos-verdant:
+    radial-gradient(60% 45% at 72% 78%, rgba(212, 240, 28, 0.16) 0%, transparent 70%),
+    radial-gradient(90% 60% at 40% 70%, var(--c-sage-mist) 0%, transparent 75%),
+    radial-gradient(120% 60% at 20% 0%, var(--c-forest) 0%, transparent 65%),
+    linear-gradient(180deg, var(--c-forest) 0%, var(--c-sage) 48%, #9cbd8a 100%);
+  --atmos-champagne:
+    radial-gradient(70% 55% at 35% 85%, var(--c-citron) 0%, transparent 70%),
+    radial-gradient(80% 60% at 80% 45%, var(--c-amber) 0%, transparent 70%),
+    radial-gradient(120% 55% at 10% 0%, var(--c-taupe-deep) 0%, transparent 65%),
+    linear-gradient(170deg, var(--c-taupe-deep) 0%, #8a785f 34%, var(--c-champagne) 66%, var(--c-amber) 100%);
+  --atmos-dusk:
+    radial-gradient(70% 45% at 68% 38%, var(--c-coral) 0%, transparent 70%),
+    radial-gradient(120% 55% at 15% 0%, var(--c-coral-deep) 0%, transparent 60%),
+    radial-gradient(100% 60% at 50% 100%, var(--c-slate) 0%, transparent 75%),
+    linear-gradient(180deg, var(--c-coral-deep) 0%, #b47a63 40%, var(--c-slate) 100%);
+  --atmos-mist:
+    radial-gradient(70% 55% at 65% 80%, var(--c-sage-mist) 0%, transparent 70%),
+    radial-gradient(120% 55% at 15% 0%, var(--c-slate-deep) 0%, transparent 65%),
+    linear-gradient(170deg, var(--c-slate-deep) 0%, var(--c-taupe) 55%, var(--c-sage-mist) 100%);
+  /* Fixed-height scrim: always covers the label (two lines) and value rows, whatever the card height */
+  --atmos-scrim: linear-gradient(
+    180deg,
+    rgba(22, 22, 20, 0.42) 0px,
+    rgba(22, 22, 20, 0.4) 112px,
+    rgba(22, 22, 20, 0) 176px
+  );
+  --atmos-glass: rgba(22, 22, 20, 0.5);
+
+  /* ---------- Type ---------- */
+  /* Bundled variable font (@fontsource-variable/urbanist), weights 100–900, no network */
+  --font-sans: 'Urbanist Variable', 'Urbanist', 'Avenir Next', system-ui, sans-serif;
+
+  /* ---------- Space (4-pt) ---------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --seam: 6px; /* the thin canvas seam between panels */
+
+  /* ---------- Radius & borders ---------- */
+  --r-chip: 2px;
+  --r-control: 4px;
+  --r-panel: 6px;
+  --b-hairline: 1px solid var(--c-hairline);
+  --b-control: 1px solid var(--c-control);
+  --shadow-panel: 0 1px 2px rgba(27, 27, 25, 0.05);
+
+  /* ---------- Motion ---------- */
+  --dur-instant: 100ms; /* press feedback */
+  --dur-quick: 180ms; /* hover, colour changes */
+  --dur-gentle: 360ms; /* small reveals, notices */
+  --dur-calm: 640ms; /* entrances */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-calm: cubic-bezier(0.65, 0, 0.35, 1);
+
+  font-family: var(--font-sans);
+  color: var(--c-ink);
+}
+
+/* ---------- Type scale ---------- */
+.aurae-v2 .t-display {
+  font-size: clamp(44px, 4.4vw, 64px);
+  line-height: 0.98;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+}
+.aurae-v2 .t-headline {
+  font-size: clamp(28px, 2.4vw, 34px);
+  line-height: 1.12;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.aurae-v2 .t-metric {
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.aurae-v2 .t-title {
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+.aurae-v2 .t-body {
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+.aurae-v2 .t-label {
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+.aurae-v2 .t-micro {
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- Status chip ---------- */
+.aurae-v2 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 var(--s-2);
+  border-radius: var(--r-chip);
+  background: var(--c-raised);
+  color: var(--c-ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.aurae-v2 .chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-ink-3);
+  flex: none;
+}
+.aurae-v2 .chip--glass {
+  background: var(--atmos-glass);
+  color: var(--c-on-atmos);
+  backdrop-filter: blur(8px);
+}
+.aurae-v2 .chip--glass .chip__dot {
+  background: var(--c-on-atmos-2);
+}
+
+/* ---------- Buttons ---------- */
+.aurae-v2 .btn {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  height: 44px;
+  padding: 0 var(--s-6);
+  border-radius: var(--r-control);
+  border: var(--b-control);
+  background: var(--c-panel);
+  color: var(--c-ink);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-quick) var(--ease-out-soft),
+    border-color var(--dur-quick) var(--ease-out-soft),
+    transform var(--dur-instant) var(--ease-out-soft);
+}
+.aurae-v2 .btn:hover {
+  background: var(--c-raised);
+}
+.aurae-v2 .btn:active {
+  transform: translateY(1px);
+}
+.aurae-v2 .btn--primary {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-panel);
+}
+.aurae-v2 .btn--primary:hover {
+  background: #33332f;
+}
+.aurae-v2 .btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+.aurae-v2 .btn:disabled:hover {
+  background: var(--c-panel);
+}
+/* Waiting for the tick: still focusable and readable, but visibly not the next step yet */
+.aurae-v2 .btn--primary[aria-disabled='true'] {
+  background: #4a4944;
+  border-color: #4a4944;
+  cursor: default;
+}
+
+/* ---------- Focus: one ring everywhere, inverted on gradients ---------- */
+.aurae-v2 :focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
