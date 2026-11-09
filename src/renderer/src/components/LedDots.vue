@@ -16,9 +16,16 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const GRID = 12 // must match `background-size` in .au-hero
 const RADIUS = 60 // px around the pointer that lights up
-const FADE_IN = 0.12 // seconds (time constant): how quickly dots brighten
-const FADE_OUT = 0.7 // seconds: how slowly they dim, i.e. the length of the trail
-const FOLLOW = 0.08 // seconds: how softly the light glides after the pointer
+
+// Timing (seconds, as easing time constants). With "Reduce motion" on, the light no longer
+// glides or leaves a trail: dots simply switch on under the pointer and off when it leaves.
+const MOTION = { fadeIn: 0.12, fadeOut: 0.7, follow: 0.08 } // fadeOut = trail length
+const REDUCED = { fadeIn: 0.04, fadeOut: 0.06, follow: 0 }
+const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+let timing = reducedQuery.matches ? REDUCED : MOTION
+const onReducedChange = (e: MediaQueryListEvent): void => {
+  timing = e.matches ? REDUCED : MOTION
+}
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
@@ -90,16 +97,16 @@ function frame(now: number): void {
   const dt = Math.min((now - last) / 1000, 0.05) // seconds since last frame (capped after tab switches)
   last = now
 
-  // Glide the light towards the pointer
-  const follow = 1 - Math.exp(-dt / FOLLOW)
+  // Glide the light towards the pointer (jump straight there with reduced motion)
+  const follow = timing.follow > 0 ? 1 - Math.exp(-dt / timing.follow) : 1
   lightX += (targetX - lightX) * follow
   lightY += (targetY - lightY) * follow
 
   // Ease every dot towards its target brightness: quick to light, slow to fade
   const want = targets()
   for (const key of want.keys()) if (!lit.has(key)) lit.set(key, 0)
-  const up = 1 - Math.exp(-dt / FADE_IN)
-  const down = 1 - Math.exp(-dt / FADE_OUT)
+  const up = 1 - Math.exp(-dt / timing.fadeIn)
+  const down = 1 - Math.exp(-dt / timing.fadeOut)
   for (const [key, a] of lit) {
     const target = want.get(key) ?? 0
     const next = a + (target - a) * (target > a ? up : down)
@@ -172,6 +179,7 @@ onMounted(() => {
   // The canvas ignores the mouse (so content stays clickable); listen on the panel instead
   host.addEventListener('pointermove', onMove)
   host.addEventListener('pointerleave', onLeave)
+  reducedQuery.addEventListener('change', onReducedChange)
   observer = new ResizeObserver(resize)
   observer.observe(el)
   resize()
@@ -182,6 +190,7 @@ onBeforeUnmount(() => {
   observer?.disconnect()
   host?.removeEventListener('pointermove', onMove)
   host?.removeEventListener('pointerleave', onLeave)
+  reducedQuery.removeEventListener('change', onReducedChange)
 })
 </script>
 

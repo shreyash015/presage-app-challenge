@@ -39,10 +39,13 @@ function createWindow(): void {
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
+  // AURAE_PROTOTYPE=1 (development only) opens the consent-screen redesign prototype instead.
+  const prototype = is.dev && process.env['AURAE_PROTOTYPE'] === '1'
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    const url = process.env['ELECTRON_RENDERER_URL']
+    mainWindow.loadURL(prototype ? `${url}/prototype.html` : url)
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, `../renderer/${prototype ? 'prototype' : 'index'}.html`))
   }
 }
 
