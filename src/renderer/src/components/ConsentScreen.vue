@@ -230,7 +230,8 @@ onBeforeUnmount(() => ro?.disconnect())
     height: 100dvh;
     min-height: 600px;
     grid-template-columns: minmax(0, 1fr) clamp(420px, 36vw, 480px);
-    grid-template-rows: minmax(0, 1fr) 148px;
+    /* readings row sizes to the cards, which grow to fit their artwork */
+    grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: 'hero consent' 'cards consent';
   }
 }
