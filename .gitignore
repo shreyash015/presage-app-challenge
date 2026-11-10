@@ -5,3 +5,20 @@ out
 .eslintcache
 *.log*
 .env.local
+
+# Local design prototypes and preview galleries (kept on disk, not pushed)
+src/renderer/src/prototype/
+src/renderer/src/artwork-preview/
+src/renderer/card-art-prototype.html
+src/renderer/artwork-preview.html
+card-art-prototype.vite.config.ts
+artwork-preview.vite.config.ts
+tsconfig.card-art-prototype.json
+tsconfig.artwork-preview.json
+tests/artwork-preview.audit.cjs
+ARTWORK_REVIEW.md
+
+# Test and review output
+screenshots/
+test-results/
+playwright-report/

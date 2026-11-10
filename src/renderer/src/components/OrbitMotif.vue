@@ -1,7 +1,17 @@
 <script setup lang="ts">
 /**
  * OrbitMotif — the hero visualization.
- * Same geometry and gentle motion as the live orbit, refined:
+ *
+ * Ambient motion, one breath driving everything (8s, ease-in-out, infinite):
+ *  - rings scale 1 → 1.012 → 1 (inhale / exhale)
+ *  - the whole motif rises 0 → −2px → 0 with the inhale (drift is on the HTML box, so the
+ *    callout label and the leader line stay aligned)
+ *  - the signal halo swells and brightens with the inhale, instead of its own faster pulse
+ * Independently, the belts tilt ±1.25° over a slower 20s cycle, so the motion never reads as
+ * mechanical. Nothing here relates to measurements: it is decoration, not live data.
+ * With reduced motion every loop is off and the motif is still.
+ *
+ * Also:
  *  - hairline strokes that stay 0.75px at any size (vector-effect: non-scaling-stroke)
  *  - every animated SVG element has tabindex="-1" (motion-v's focus listeners made them tab stops)
  *  - an editorial callout from the signal dot, explaining what the dot is
@@ -17,30 +27,32 @@ const reduce = useReducedMotion()
 const rings = Array.from({ length: 10 }, (_, i) => 18 + i * 10)
 const belts = [30, 52, 74, 96, 118]
 
-// Idle: rings breathe, belts tilt. Off with reduced motion.
+// Ambient breath: one 8s inhale/exhale shared by scale, drift and halo, so they stay in phase.
+const BREATH = duration.breathe // 8s
+const BELT_DRIFT = duration.drift // 20s
+const breathLoop = { duration: BREATH, repeat: Infinity, ease: 'easeInOut' } as const
+
 const breathe = computed(() =>
-  reduce.value
-    ? {}
-    : {
-        animate: { scale: [1, 1.012, 1] },
-        transition: { duration: duration.breathe, repeat: Infinity, ease: ease.inOutCalm }
-      }
+  reduce.value ? {} : { animate: { scale: [1, 1.012, 1] }, transition: breathLoop }
 )
+// The whole motif rises 2px on the inhale (CSS pixels: applied to the HTML box, not the SVG)
+const rise = computed(() =>
+  reduce.value ? {} : { animate: { y: [0, -2, 0] }, transition: breathLoop }
+)
+// Belts: ±1.25° over a slower, independent cycle
 const tilt = computed(() =>
   reduce.value
     ? {}
     : {
-        animate: { rotate: [0, 2, 0, -2, 0] },
-        transition: { duration: duration.drift, repeat: Infinity, ease: ease.inOutCalm }
+        animate: { rotate: [0, 1.25, 0, -1.25, 0] },
+        transition: { duration: BELT_DRIFT, repeat: Infinity, ease: 'easeInOut' }
       }
 )
+// Halo: a soft swell with the inhale (was a separate 2.6s pulse, which read like a heartbeat)
 const halo = computed(() =>
   reduce.value
     ? {}
-    : {
-        animate: { opacity: [0.5, 1, 0.5], scale: [1, 1.14, 1] },
-        transition: { duration: 2.6, repeat: Infinity, ease: ease.inOutCalm }
-      }
+    : { animate: { opacity: [0.45, 0.85, 0.45], scale: [1, 1.1, 1] }, transition: breathLoop }
 )
 
 // Hover: layers drift a few units towards the pointer (parallax). Off with reduced motion.
@@ -73,7 +85,13 @@ const soft = { duration: duration.calm, ease: ease.outSoft }
 
 <template>
   <div class="orbit-area">
-    <div class="orbit" @pointerenter="hovering = true" @pointermove="onMove" @pointerleave="onLeave">
+    <motion.div
+      v-bind="rise"
+      class="orbit"
+      @pointerenter="hovering = true"
+      @pointermove="onMove"
+      @pointerleave="onLeave"
+    >
       <svg viewBox="-20 0 340 320" class="orbit__svg" aria-hidden="true" focusable="false">
         <motion.g
           tabindex="-1"
@@ -139,7 +157,7 @@ const soft = { duration: duration.calm, ease: ease.outSoft }
         <span class="callout__title">Your signal</span>
         <span class="callout__note">Appears when the camera is on</span>
       </div>
-    </div>
+    </motion.div>
   </div>
 </template>
 
