@@ -4,8 +4,18 @@
  * One atmosphere (gradient family) + one static line drawing per reading (design/cardArt.ts).
  * The art is decorative and carries no data: no values, scales or classifications are shown
  * until the camera is on. The drawing sits in the card's flow, so the card grows to fit it.
+ *
+ * Signal flow: the chartreuse signal travels along its rail (one of the drawing's own lines)
+ * with native SVG animation (<animateMotion> + <mpath>), so it can never leave the line.
+ * One cycle: fade in at the rail's start → glide (soft start, long settle) → rest where the static
+ * design places it (the end of the rail on all three cards) → fade out. A faint chartreuse
+ * trail, a dash on the same path driven by the same keys, follows the dot.
+ * Deliberately ambient: one slow 12s cycle shared by all three cards, so the signals appear and
+ * leave in unison; unrelated to any measurement. With reduced motion the signal stays at rest.
  */
-import { drawing, type ArtKind } from '../design/cardArt'
+import { computed, onMounted, ref } from 'vue'
+import { useReducedMotion } from 'motion-v'
+import { drawing, type ArtKind, type Dot } from '../design/cardArt'
 
 const props = defineProps<{
   label: string
@@ -18,6 +28,68 @@ const props = defineProps<{
 const kind: ArtKind = props.art === 'orbit' ? 'pulse' : props.art === 'helix' ? 'breathing' : 'hrv'
 const drawn = drawing(kind)
 const fadeId = `aurae-art-fade-${kind}`
+
+// ---- Signal flow ----
+const reduce = useReducedMotion()
+const railId = `aurae-art-rail-${kind}`
+const signal = drawn.dots.find((d) => d.tone === 'signal') as Dot
+// One shared, slow cycle (unrelated to physiology): all three signals fade in on their lines
+// together and fade out together. Every card uses the same document clock (begin 0), so they
+// stay locked in step; only the path each one takes in between differs.
+const CYCLE = { dur: 12, begin: 0 }
+const TRAIL = 42 // trail length, in viewBox units
+const GLIDE = '0.45 0 0.2 1' // soft start, long settle
+const HOLD = '0 0 1 1'
+
+const railEl = ref<SVGPathElement | null>(null)
+function setRail(el: unknown, d: string): void {
+  if (d === drawn.rail && el) railEl.value = el as SVGPathElement
+}
+// Measured once mounted: the rail's length and where on it the signal rests (0…1)
+const rail = ref<{ length: number; rest: number } | null>(null)
+onMounted(() => {
+  const el = railEl.value
+  if (!el) return
+  const length = el.getTotalLength()
+  let best = Infinity
+  let rest = 1
+  for (let i = 0; i <= 400; i++) {
+    const p = el.getPointAtLength((length * i) / 400)
+    const dist = (p.x - signal.x) ** 2 + (p.y - signal.y) ** 2
+    if (dist < best) [best, rest] = [dist, i / 400]
+  }
+  rail.value = { length, rest }
+})
+
+const flow = computed(() => {
+  if (reduce.value || !rail.value) return null
+  const { length: L, rest } = rail.value
+  const { dur, begin } = CYCLE
+  const atEnd = rest > 0.98
+  // Rest at the end (all three cards today): fade in · glide to the end · rest · fade out.
+  // Rest mid-rail (kept for future drawings): fade in · glide to rest · pause · finish · fade out.
+  const keyTimes = atEnd ? [0, 0.07, 0.66, 0.92, 1] : [0, 0.07, 0.46, 0.68, 0.92, 1]
+  const points = atEnd ? [0, 0, 1, 1, 1] : [0, 0, rest, rest, 1, 1]
+  const splines = atEnd ? [HOLD, GLIDE, HOLD, HOLD] : [HOLD, GLIDE, HOLD, '0.55 0 0.45 1', HOLD]
+  const dot = atEnd ? [0, 1, 1, 1, 0] : [0, 1, 1, 1, 1, 0]
+  // The trail shows while moving and dissolves while the signal rests
+  const trail = atEnd ? [0, 0.55, 0.55, 0, 0] : [0, 0.55, 0.55, 0.1, 0.55, 0]
+  const join = (v: Array<number | string>): string => v.join(';')
+  return {
+    dur: `${dur}s`,
+    begin: `${begin}s`,
+    keyTimes: join(keyTimes),
+    keyPoints: join(points),
+    keySplines: join(splines),
+    dotOpacity: join(dot),
+    trailOpacity: join(trail),
+    // dash [TRAIL, gap] whose visible segment always ends at the dot: offset = TRAIL − p·L
+    dash: `${TRAIL} ${L + TRAIL}`,
+    dashOffset: join(points.map((p) => (TRAIL - p * L).toFixed(2)))
+  }
+})
+// While the signal flows, its static copy is not drawn
+const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' || !flow.value))
 </script>
 
 <template>
@@ -47,6 +119,8 @@ const fadeId = `aurae-art-fade-${kind}`
       <g class="art">
         <path
           v-for="(s, i) in drawn.strokes"
+          :id="s.d === drawn.rail ? railId : undefined"
+          :ref="(el) => setRail(el, s.d)"
           :key="i"
           :d="s.d"
           :stroke="s.fade ? `url(#${fadeId})` : undefined"
@@ -55,13 +129,65 @@ const fadeId = `aurae-art-fade-${kind}`
           vector-effect="non-scaling-stroke"
         />
         <circle
-          v-for="(d, i) in drawn.dots"
+          v-for="(d, i) in staticDots"
           :key="'d' + i"
           :cx="d.x"
           :cy="d.y"
           :r="d.r"
           :class="d.tone === 'signal' ? 'art__signal' : 'art__dot'"
         />
+      </g>
+      <!-- The travelling signal: trail + halo + dot, all driven by the same keys -->
+      <g v-if="flow" class="art__flow">
+        <path
+          :d="drawn.rail"
+          class="art__trail"
+          :stroke-dasharray="flow.dash"
+          :stroke-dashoffset="flow.dashOffset.split(';')[0]"
+          opacity="0"
+        >
+          <animate
+            attributeName="stroke-dashoffset"
+            :values="flow.dashOffset"
+            :keyTimes="flow.keyTimes"
+            :keySplines="flow.keySplines"
+            calcMode="spline"
+            :dur="flow.dur"
+            :begin="flow.begin"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="opacity"
+            :values="flow.trailOpacity"
+            :keyTimes="flow.keyTimes"
+            :dur="flow.dur"
+            :begin="flow.begin"
+            repeatCount="indefinite"
+          />
+        </path>
+        <g opacity="0">
+          <circle r="10" class="art__halo" />
+          <circle r="4" class="art__signal" />
+          <animateMotion
+            :keyPoints="flow.keyPoints"
+            :keyTimes="flow.keyTimes"
+            :keySplines="flow.keySplines"
+            calcMode="spline"
+            :dur="flow.dur"
+            :begin="flow.begin"
+            repeatCount="indefinite"
+          >
+            <mpath :href="`#${railId}`" />
+          </animateMotion>
+          <animate
+            attributeName="opacity"
+            :values="flow.dotOpacity"
+            :keyTimes="flow.keyTimes"
+            :dur="flow.dur"
+            :begin="flow.begin"
+            repeatCount="indefinite"
+          />
+        </g>
       </g>
     </svg>
     <span class="chip chip--glass card__status"><span class="chip__dot" />Waiting for camera</span>
@@ -154,6 +280,17 @@ const fadeId = `aurae-art-fade-${kind}`
   stroke: none;
 }
 
+/* Trail: user-space stroke (no non-scaling) so the dash stays in step with the dot */
+.art__trail {
+  fill: none;
+  stroke: var(--c-signal);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.art__halo {
+  fill: var(--c-signal);
+  opacity: 0.2;
+}
 .art__signal {
   fill: var(--c-signal);
   stroke: none;

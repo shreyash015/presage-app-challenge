@@ -32,6 +32,12 @@ export interface Dot {
 export interface Drawing {
   strokes: Stroke[]
   dots: Dot[]
+  /**
+   * The line the chartreuse signal travels along (one of the strokes). The signal's resting
+   * position, its `dots` entry, lies on this path: at the end for Pulse and Breathing, at the
+   * apex for HRV.
+   */
+  rail: string
 }
 
 const X0 = 14
@@ -80,7 +86,8 @@ function pulse(): Drawing {
     dots: [
       { x: X0, y: yStart, r: 2.6, tone: 'white' },
       { x: X1, y: yEnd, r: 4, tone: 'signal' }
-    ]
+    ],
+    rail: strokes[2].d // a middle curve of the lens; all six meet at the end point
   }
 }
 
@@ -97,7 +104,8 @@ function breathing(): Drawing {
   const strokes = amps.map((a, i) => {
     return { d: curve((t) => c - a * Math.sin(2 * Math.PI * t)), opacity: 0.86 - i * 0.1 }
   })
-  return { strokes, dots: [{ x: X1, y: c, r: 4, tone: 'signal' }] }
+  // rail: the middle oscillation; all five meet at the end point
+  return { strokes, dots: [{ x: X1, y: c, r: 4, tone: 'signal' }], rail: strokes[2].d }
 }
 
 // ---------------------------------------------------------------- HRV
@@ -113,7 +121,8 @@ function breathing(): Drawing {
  * Composition rules (controlled asymmetry):
  *  - the spans overlap rather than nest, and none shares a foot
  *  - the eight feet fall at deliberately irregular intervals (22–64 units), the variability itself
- *  - heights vary out of order (84, 54, 42, 26); the tallest span carries the chartreuse apex
+ *  - heights vary out of order (84, 54, 42, 26); the tallest span is the signal's rail, and the
+ *    chartreuse signal rests at its far foot (the end of the rail, as on the other two cards)
  *  - two faint echo strokes follow the principal spans for depth
  *  - the baseline is implied: a hairline that fades out at both ends
  *  - raised: baseline at y = 98 (was 112), so the drawing's weight sits above the card's centre line
@@ -170,9 +179,10 @@ function hrv(): Drawing {
 
   const feet = spans.flatMap(({ span }) => [span.x0, span.x1]).sort((a, b2) => a - b2)
   const dots: Dot[] = feet.map((x) => ({ x, y: b, r: 1.6, tone: 'white' }))
-  const top = spanCurve(principal).apex
-  dots.push({ x: top.x, y: top.y, r: 4, tone: 'signal' })
-  return { strokes, dots }
+  // The signal rests at the principal span's far foot, the end of its rail, like Pulse and
+  // Breathing, so all three travel the full length of their line and settle together.
+  dots.push({ x: principal.x1, y: b, r: 4, tone: 'signal' })
+  return { strokes, dots, rail: spanCurve(principal).d }
 }
 
 export function drawing(kind: ArtKind): Drawing {
