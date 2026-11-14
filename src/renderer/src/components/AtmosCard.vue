@@ -22,7 +22,18 @@ const props = defineProps<{
   unit: string
   family: 'verdant' | 'champagne' | 'dusk' | 'mist'
   art: 'orbit' | 'helix' | 'arcs'
+  /** Live reading (session screen). Omitted on the consent screen: the card shows "– –". */
+  value?: number | null
+  /** Status chip text. Defaults to "Waiting for camera". */
+  status?: string
 }>()
+const shown = computed(() => (props.value == null ? null : Math.round(props.value)))
+const statusText = computed(() => props.status ?? 'Waiting for camera')
+const ariaLabel = computed(() =>
+  shown.value == null
+    ? `${props.label}, ${statusText.value.toLowerCase()}`
+    : `${props.label} ${shown.value} ${props.unit}, ${statusText.value.toLowerCase()}`
+)
 
 // Same prop values as the live card; each maps to its new drawing
 const kind: ArtKind = props.art === 'orbit' ? 'pulse' : props.art === 'helix' ? 'breathing' : 'hrv'
@@ -93,10 +104,13 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
 </script>
 
 <template>
-  <article :class="['card', 'card--' + family]" :aria-label="`${label}, waiting for camera`">
+  <article :class="['card', 'card--' + family]" :aria-label="ariaLabel">
     <span class="card__label">{{ label }}</span>
     <div class="card__value" aria-hidden="true">
-      <span class="t-metric">–&thinsp;–</span><span class="card__unit">{{ unit }}</span>
+      <span class="t-metric">
+        <template v-if="shown == null">–&thinsp;–</template>
+        <template v-else>{{ shown }}</template>
+      </span><span class="card__unit">{{ unit }}</span>
     </div>
     <!-- In the card's flow, between the value and the status: the card grows to fit it (option A) -->
     <svg
@@ -190,7 +204,7 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
         </g>
       </g>
     </svg>
-    <span class="chip chip--glass card__status"><span class="chip__dot" />Waiting for camera</span>
+    <span class="chip chip--glass card__status"><span class="chip__dot" />{{ statusText }}</span>
   </article>
 </template>
 
