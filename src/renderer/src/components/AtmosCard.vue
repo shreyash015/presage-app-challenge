@@ -35,7 +35,7 @@ const ariaLabel = computed(() =>
     : `${props.label} ${shown.value} ${props.unit}, ${statusText.value.toLowerCase()}`
 )
 
-// Same prop values as the live card; each maps to its new drawing
+// Each `art` value maps to its drawing
 const kind: ArtKind = props.art === 'orbit' ? 'pulse' : props.art === 'helix' ? 'breathing' : 'hrv'
 const drawn = drawing(kind)
 const fadeId = `aurae-art-fade-${kind}`
@@ -105,14 +105,14 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
 
 <template>
   <article :class="['card', 'card--' + family]" :aria-label="ariaLabel">
-    <span class="card__label">{{ label }}</span>
+    <span class="card__label t-body">{{ label }}</span>
     <div class="card__value" aria-hidden="true">
       <span class="t-metric">
         <template v-if="shown == null">–&thinsp;–</template>
         <template v-else>{{ shown }}</template>
       </span><span class="card__unit">{{ unit }}</span>
     </div>
-    <!-- In the card's flow, between the value and the status: the card grows to fit it (option A) -->
+    <!-- In the card's flow, between the value and the status: the card grows to fit it -->
     <svg
       class="card__art"
       viewBox="0 0 340 130"
@@ -216,7 +216,7 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
   box-sizing: border-box;
   height: 100%;
   min-height: 140px;
-  padding: 18px 20px;
+  padding: var(--s-5);
   border-radius: var(--r-panel);
   color: var(--c-on-atmos);
   display: flex;
@@ -260,7 +260,7 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
-/* New artwork, option A: in the card's normal flow between the value and the status chip, so
+/* The artwork sits in the card's normal flow between the value and the status chip, so
    the card grows to fit it and the drawing can never overlap the text. The drawing fills
    x 14…326 = 92% of the viewBox, so the box is 87% of the card's full width (87% × 92% ≈ 80%),
    centred across the card's padding. Aspect ratio is locked to 340×130: never distorted. If a
@@ -273,7 +273,7 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
   width: calc((100% + 40px) * 0.87);
   height: auto;
   aspect-ratio: 340 / 130;
-  margin: auto 0 12px calc((100% + 40px) * 0.065 - 20px);
+  margin: auto 0 var(--s-3) calc((100% + 40px) * 0.065 - 20px);
   overflow: visible;
   pointer-events: none;
 }
@@ -310,13 +310,8 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
   stroke: none;
 }
 
+/* Full width (the art sits below, in the flow), so every label fits on one line */
 .card__label {
-  max-width: 56%;
-  /* text column: the art zone takes the rest */
-  min-height: 2.7em;
-  /* room for two lines, so values align across cards */
-  font-size: 14px;
-  line-height: 1.35;
   font-weight: 500;
 }
 
@@ -324,7 +319,7 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: var(--s-2);
 }
 
 /* Units set large and light, as in the references ("25 years"). At 24px this is WCAG large text

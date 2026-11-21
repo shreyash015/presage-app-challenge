@@ -13,6 +13,7 @@ function createWindow(): void {
     minWidth: 360,
     minHeight: 560,
     show: false,
+    backgroundColor: '#f2f0eb', // --c-canvas: no white flash before the first paint or on resize
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {

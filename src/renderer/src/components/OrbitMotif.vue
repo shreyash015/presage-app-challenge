@@ -154,8 +154,8 @@ const soft = { duration: duration.calm, ease: ease.outSoft }
 
       <!-- Label sits on the leader's horizontal run: x = (196 + 20) / 340, y = 118 / 320 -->
       <div v-if="callout" class="callout" style="left: 63.5%; top: 36.9%">
-        <span class="callout__title">Your signal</span>
-        <span class="callout__note">Appears when the camera is on</span>
+        <span class="callout__title t-body">Your signal</span>
+        <span class="callout__note t-label">Appears when the camera is on</span>
       </div>
     </motion.div>
   </div>
@@ -183,8 +183,8 @@ const soft = { duration: duration.calm, ease: ease.outSoft }
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(closest-side, rgba(212, 240, 28, 0.08), transparent 45%),
-    radial-gradient(closest-side, rgba(232, 214, 180, 0.5), transparent 100%);
+    radial-gradient(closest-side, color-mix(in srgb, var(--c-signal) 8%, transparent), transparent 45%),
+    radial-gradient(closest-side, color-mix(in srgb, var(--c-champagne) 50%, transparent), transparent 100%);
 }
 .orbit__svg {
   display: block;
@@ -223,23 +223,17 @@ const soft = { duration: duration.calm, ease: ease.outSoft }
   transform: translateY(calc(-100% - 6px));
   display: grid;
   gap: 2px;
-  padding: 8px 18px 4px 0;
+  padding-bottom: var(--s-1);
   white-space: nowrap;
   pointer-events: none;
-  /* Feathered panel-coloured backing so the label never sits directly on the ring lines */
-  background: radial-gradient(
-    farthest-side at 40% 55%,
-    rgba(250, 249, 246, 0.96) 55%,
-    rgba(250, 249, 246, 0)
-  );
+  /* No backing: like the hero title, the label sits directly over the hairlines */
 }
 .callout__title {
-  font-size: 15px;
   font-weight: 500;
   color: var(--c-ink);
 }
 .callout__note {
-  font-size: 13px;
+  font-weight: 400;
   color: var(--c-ink-3);
 }
 </style>

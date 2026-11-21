@@ -39,7 +39,7 @@ async function onStop(): Promise<void> {
 </script>
 
 <template>
-  <!-- "Not now" (decline) still has no destination: see the readiness report, item A5 -->
+  <!-- "Not now" (decline) has no destination yet, so it leaves the consent screen in place -->
   <ConsentScreen
     v-if="!consented"
     :error="startError"

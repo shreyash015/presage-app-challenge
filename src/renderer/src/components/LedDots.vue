@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * LedDots — dots of the `.au-hero` dot grid light up like soft LEDs around the mouse pointer.
+ * LedDots — dots of a `.panel--dots` grid light up like soft LEDs around the mouse pointer.
  *
  * The dots themselves are a CSS background (a 12px grid with a dot in the centre of each cell),
  * and CSS can't light one dot of a background. So this draws on a <canvas> laid exactly over
@@ -10,11 +10,11 @@
  * gentle trail. Nothing runs while the pointer is away and every dot has faded.
  *
  * Place it as a child of the element that has the dot background; that element must be
- * `position: relative` (au-hero is) and `isolation: isolate`, so the canvas can sit behind content.
+ * `position: relative` and `isolation: isolate`, so the canvas can sit behind content.
  */
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-const GRID = 12 // must match `background-size` in .au-hero
+const GRID = 12 // must match `background-size` of .panel--dots (design/tokens.css)
 const RADIUS = 60 // px around the pointer that lights up
 
 // Timing (seconds, as easing time constants). With "Reduce motion" on, the light no longer
@@ -35,7 +35,7 @@ let width = 0
 let height = 0
 let cols = 0
 let rows = 0
-let colors = { lime: '#d6f21e', edge: '#6f8a05' }
+let colors = { lime: '#d4f01c', edge: '#5f7a00' } // fallbacks; read from the tokens on mount
 let observer: ResizeObserver | null = null
 let raf = 0
 let last = 0
@@ -173,8 +173,8 @@ onMounted(() => {
   ctx = el.getContext('2d')
   const css = getComputedStyle(el)
   colors = {
-    lime: css.getPropertyValue('--lime').trim() || colors.lime,
-    edge: css.getPropertyValue('--lime-edge').trim() || colors.edge
+    lime: css.getPropertyValue('--c-signal').trim() || colors.lime,
+    edge: css.getPropertyValue('--c-signal-edge').trim() || colors.edge
   }
   // The canvas ignores the mouse (so content stays clickable); listen on the panel instead
   host.addEventListener('pointermove', onMove)
@@ -195,5 +195,17 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <canvas ref="canvas" class="pointer-events-none absolute inset-0 -z-10 size-full" aria-hidden="true" />
+  <canvas ref="canvas" class="leds" aria-hidden="true" />
 </template>
+
+<style scoped>
+/* Fills its panel, behind the content, and never takes pointer events */
+.leds {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+</style>
