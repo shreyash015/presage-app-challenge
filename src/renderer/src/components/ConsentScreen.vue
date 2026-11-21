@@ -14,7 +14,6 @@ import OrbitMotif from './OrbitMotif.vue'
 import AtmosCard from './AtmosCard.vue'
 import LedDots from './LedDots.vue'
 import { enter } from '../design/motion'
-import '../design/tokens.css'
 
 const emit = defineEmits<{ accept: []; decline: [] }>()
 
@@ -109,7 +108,11 @@ onBeforeUnmount(() => ro?.disconnect())
 <template>
   <main class="aurae-v2 v2">
     <!-- ============ Hero: what is about to happen ============ -->
-    <motion.section v-bind="enter(0, reduce)" class="hero" aria-label="About this session">
+    <motion.section
+      v-bind="enter(0, reduce)"
+      class="hero panel panel--dots"
+      aria-label="About this session"
+    >
       <LedDots />
 
       <header class="hero__bar">
@@ -117,7 +120,7 @@ onBeforeUnmount(() => ro?.disconnect())
           <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4" />
           </svg>
-          <span class="brand__name">Aurae</span>
+          <span class="t-title">Aurae</span>
         </span>
         <span class="chip"><span class="chip__dot" />Camera off</span>
       </header>
@@ -132,7 +135,11 @@ onBeforeUnmount(() => ro?.disconnect())
     </motion.section>
 
     <!-- ============ Consent: the decision ============ -->
-    <motion.section v-bind="enter(1, reduce)" class="consent" aria-labelledby="consent-title">
+    <motion.section
+      v-bind="enter(1, reduce)"
+      class="consent panel"
+      aria-labelledby="consent-title"
+    >
       <!-- Named region; when it scrolls, Tab reaches it and arrow/Page keys scroll it -->
       <div
         ref="body"
@@ -223,7 +230,6 @@ onBeforeUnmount(() => ro?.disconnect())
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas: 'hero' 'consent' 'cards';
-  -webkit-font-smoothing: antialiased;
 }
 @media (min-width: 1024px) {
   .v2 {
@@ -249,12 +255,6 @@ onBeforeUnmount(() => ro?.disconnect())
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-width: 0;
-  min-height: 0;
-  border-radius: var(--r-panel);
-  background-color: var(--c-panel);
-  background-image: radial-gradient(var(--c-canvas-dot) 1px, transparent 1.2px);
-  background-size: 12px 12px;
   padding: var(--s-5);
   display: grid;
   gap: var(--s-4);
@@ -268,23 +268,6 @@ onBeforeUnmount(() => ro?.disconnect())
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-}
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-.brand__mark {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: var(--c-ink);
-  stroke-width: 1.1;
-  stroke-linecap: round;
-}
-.brand__name {
-  font-size: 17px;
-  font-weight: 500;
 }
 .hero__title {
   grid-area: title;
@@ -310,8 +293,9 @@ onBeforeUnmount(() => ro?.disconnect())
   z-index: 1;
 }
 @media (min-width: 1024px) {
+  /* Panels share one top inset (--s-8), so the brand row and the consent eyebrow line up */
   .hero {
-    padding: 28px 32px 32px;
+    padding: var(--s-8);
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr) auto;
     grid-template-areas: 'bar' 'title' 'orbit' 'note';
@@ -322,7 +306,7 @@ onBeforeUnmount(() => ro?.disconnect())
     grid-column: 1;
     grid-row: 2 / 5;
     height: 100%;
-    padding: 24px 0 8px 12%;
+    padding: var(--s-6) 0 var(--s-2) 12%;
   }
   .hero__orbit :deep(.callout) {
     display: grid;
@@ -335,17 +319,12 @@ onBeforeUnmount(() => ro?.disconnect())
 /* ================= Consent ================= */
 .consent {
   grid-area: consent;
-  min-width: 0;
-  min-height: 0;
-  border-radius: var(--r-panel);
-  background: var(--c-panel);
-  box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
   container-type: inline-size;
 }
 .consent__body {
-  padding: 32px var(--s-5) var(--s-6);
+  padding: var(--s-8) var(--s-5) var(--s-6);
 }
 /* Inset ring: the fade mask would otherwise clip an outside ring's bottom edge */
 .consent__body:focus-visible {
@@ -371,7 +350,7 @@ onBeforeUnmount(() => ro?.disconnect())
 .fact {
   display: grid;
   gap: 2px;
-  padding: 12px 0;
+  padding: var(--s-3) 0;
   border-bottom: var(--b-hairline);
 }
 .fact__title {
@@ -419,7 +398,7 @@ onBeforeUnmount(() => ro?.disconnect())
   height: 20px;
   margin: 1px 0 0;
   border: 1.5px solid var(--c-control);
-  border-radius: 3px;
+  border-radius: var(--r-chip);
   background: var(--c-panel);
   cursor: pointer;
   transition:
@@ -487,7 +466,7 @@ onBeforeUnmount(() => ro?.disconnect())
 .btn--primary.is-starting {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--s-2);
   cursor: progress;
 }
 .spinner {
@@ -532,7 +511,7 @@ onBeforeUnmount(() => ro?.disconnect())
 
 @media (min-width: 640px) {
   .consent__body {
-    padding: 40px var(--s-10) var(--s-6);
+    padding: var(--s-8) var(--s-10) var(--s-6);
   }
   .decide {
     padding: var(--s-5) var(--s-10) var(--s-6);

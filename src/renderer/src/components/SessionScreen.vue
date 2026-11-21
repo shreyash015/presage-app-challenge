@@ -11,7 +11,6 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import AtmosCard from './AtmosCard.vue'
 import type { Stability } from '../composables/useVitals'
-import '../design/tokens.css'
 
 const props = defineProps<{
   stream: MediaStream | null
@@ -46,7 +45,7 @@ const hintText = computed(
 
 <template>
   <main class="aurae-v2 session">
-    <section class="hero" aria-label="Your camera">
+    <section class="hero panel panel--dots" aria-label="Your camera">
       <div class="cam" aria-hidden="true">
         <video ref="video" autoplay muted playsinline />
       </div>
@@ -56,7 +55,7 @@ const hintText = computed(
           <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4" />
           </svg>
-          <span class="brand__name">Aurae</span>
+          <span class="t-title">Aurae</span>
         </span>
         <span class="controls">
           <span class="chip chip--live"><span class="chip__dot" />Camera on</span>
@@ -133,7 +132,6 @@ const hintText = computed(
   background: var(--c-canvas);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  -webkit-font-smoothing: antialiased;
 }
 @media (min-width: 1024px) {
   .session {
@@ -149,10 +147,6 @@ const hintText = computed(
   isolation: isolate;
   overflow: hidden;
   min-height: min(70dvh, 560px);
-  border-radius: var(--r-panel);
-  background-color: var(--c-panel);
-  background-image: radial-gradient(var(--c-canvas-dot) 1px, transparent 1.2px);
-  background-size: 12px 12px;
   padding: var(--s-5);
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
@@ -161,7 +155,7 @@ const hintText = computed(
 @media (min-width: 1024px) {
   .hero {
     min-height: 0;
-    padding: 28px 32px 32px;
+    padding: var(--s-8);
   }
 }
 .cam {
@@ -195,23 +189,6 @@ const hintText = computed(
   justify-content: space-between;
   gap: var(--s-4);
   flex-wrap: wrap;
-}
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-.brand__mark {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: var(--c-ink);
-  stroke-width: 1.1;
-  stroke-linecap: round;
-}
-.brand__name {
-  font-size: 17px;
-  font-weight: 500;
 }
 .controls {
   display: inline-flex;

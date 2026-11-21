@@ -1,10 +1,11 @@
 /*
- * Aurae v2 design tokens.
- * Scoped to `.aurae-v2` (the consent screen's root) so the older aurae.css recipes are unaffected.
- * Every text/background pair below is contrast-checked; see the design spec for the figures.
+ * Aurae design system: the single source of colour, type, space, radius and motion.
+ * Tokens live on :root. The shared recipes below (type scale, chip, button, panel, brand) are
+ * scoped to `.aurae-v2`, the root class of every screen.
+ * Every text/background pair is contrast-checked (WCAG AA).
  */
 
-.aurae-v2 {
+:root {
   /* ---------- Color: surfaces ---------- */
   --c-canvas: #f2f0eb; /* warm off-white page */
   --c-canvas-dot: #d5d1c7; /* dotted texture */
@@ -13,6 +14,8 @@
 
   /* ---------- Color: ink ---------- */
   --c-ink: #1b1b19; /* primary text, primary button */
+  --c-ink-hover: #33332f; /* primary button, hovered */
+  --c-ink-idle: #4a4944; /* primary button while it waits for the consent tick */
   --c-ink-2: #55544e; /* secondary text */
   --c-ink-3: #6b6a63; /* tertiary text, still ≥ 4.5:1 on panel */
   --c-on-atmos: #ffffff; /* text on gradients */
@@ -104,7 +107,7 @@
   --r-panel: 6px;
   --b-hairline: 1px solid var(--c-hairline);
   --b-control: 1px solid var(--c-control);
-  --shadow-panel: 0 1px 2px rgba(27, 27, 25, 0.05);
+  /* No shadows: panels are separated by the canvas seam alone */
 
   /* ---------- Motion ---------- */
   --dur-instant: 100ms; /* press feedback */
@@ -113,12 +116,19 @@
   --dur-calm: 640ms; /* entrances */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-calm: cubic-bezier(0.65, 0, 0.35, 1);
-
-  font-family: var(--font-sans);
-  color: var(--c-ink);
 }
 
-/* ---------- Type scale ---------- */
+/* ---------- Page ---------- */
+body {
+  margin: 0;
+  background: var(--c-canvas);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Type scale: seven steps; nothing in the app sets a size outside it,
+   except the card unit (24px, sized for contrast, see AtmosCard) ---------- */
 .aurae-v2 .t-display {
   font-size: clamp(44px, 4.4vw, 64px);
   line-height: 0.98;
@@ -173,7 +183,7 @@
   border-radius: var(--r-chip);
   background: var(--c-raised);
   color: var(--c-ink-2);
-  font-size: 10px;
+  font-size: 11px; /* the scale's smallest step (t-micro) */
   font-weight: 500;
   white-space: nowrap;
 }
@@ -210,10 +220,10 @@
     border-color var(--dur-quick) var(--ease-out-soft),
     transform var(--dur-instant) var(--ease-out-soft);
 }
-.aurae-v2 .btn:hover {
+.aurae-v2 .btn:hover:not(:disabled) {
   background: var(--c-raised);
 }
-.aurae-v2 .btn:active {
+.aurae-v2 .btn:active:not(:disabled) {
   transform: translateY(1px);
 }
 .aurae-v2 .btn--primary {
@@ -221,26 +231,60 @@
   border-color: var(--c-ink);
   color: var(--c-panel);
 }
-.aurae-v2 .btn--primary:hover {
-  background: #33332f;
+.aurae-v2 .btn--primary:hover:not(:disabled) {
+  background: var(--c-ink-hover);
 }
+/* Disabled keeps its own fill and simply dims (a hover rule used to repaint a disabled primary
+   button in the panel colour, hiding its label) */
 .aurae-v2 .btn:disabled {
   opacity: 0.45;
   cursor: default;
-  transform: none;
-}
-.aurae-v2 .btn:disabled:hover {
-  background: var(--c-panel);
 }
 /* Waiting for the tick: still focusable and readable, but visibly not the next step yet */
 .aurae-v2 .btn--primary[aria-disabled='true'] {
-  background: #4a4944;
-  border-color: #4a4944;
+  background: var(--c-ink-idle);
+  border-color: var(--c-ink-idle);
   cursor: default;
+}
+
+/* ---------- Panel: the reading surface every screen is built from ---------- */
+.aurae-v2 .panel {
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--r-panel);
+  background-color: var(--c-panel);
+}
+/* the dotted texture; LedDots.vue lights these same dots, so the 12px grid must match its GRID */
+.aurae-v2 .panel--dots {
+  background-image: radial-gradient(var(--c-canvas-dot) 1px, transparent 1.2px);
+  background-size: 12px 12px;
+}
+
+/* ---------- Brand lockup ---------- */
+.aurae-v2 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.aurae-v2 .brand__mark {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--c-ink);
+  stroke-width: 1.1;
+  stroke-linecap: round;
 }
 
 /* ---------- Focus: one ring everywhere, inverted on gradients ---------- */
 .aurae-v2 :focus-visible {
   outline: 2px solid var(--c-focus);
   outline-offset: 2px;
+}
+
+/* ---------- Reduced motion: every transition and CSS animation off, app-wide ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
