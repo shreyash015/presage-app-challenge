@@ -6,7 +6,7 @@
  *   - "Not now" keeps the camera off and says so (nothing else happens; there is no other screen)
  *   - never touches the camera or the SDK itself; the parent starts the camera and, if that
  *     fails, passes the message back through the `error` prop
- * Disclosure text is unchanged from the original screen (proposed corrections await approval).
+ * Disclosure text must match what the app does (requested metrics, telemetry off, nothing saved).
  */
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { motion, useReducedMotion } from 'motion-v'
@@ -30,25 +30,25 @@ const starting = ref(false)
 const declined = ref(false)
 const checkbox = ref<HTMLInputElement | null>(null)
 
-// ---- Disclosures (unchanged from the original screen) ----
+// ---- Disclosures: keep in step with useVitals.ts (metrics, enableTelemetry) ----
 const lead =
-  'Aurae turns signals from your camera into the shapes and colours on this screen. Here is exactly what that means.'
+  'Aurae turns signals from your camera into the readings on this screen. Here is exactly what that means.'
 const sections = [
   {
     title: 'What Aurae reads',
-    body: 'Your pulse, breathing rate, heart-rate variability and blinks, measured from small changes in your face on camera.'
+    body: 'Your pulse, breathing rate and heart-rate variability, measured from small changes in your face on camera.'
   },
   {
     title: 'What leaves this device',
-    body: 'Camera frames are sent to Presage’s SmartSpectra service, which returns the readings. Aurae sends nothing else.'
+    body: 'Data from your camera is sent to Presage’s SmartSpectra service, which calculates the readings. Aurae sends nothing else.'
   },
   {
     title: 'What Aurae keeps',
-    body: 'Nothing. Readings live in memory while the app is open and are gone when you close it. No video or images are saved.'
+    body: 'Nothing. Readings are shown only while the camera is on and are cleared when you stop it. No readings, video or images are saved.'
   },
   {
     title: 'You’re in control',
-    body: 'Turn the camera off at any time with the camera button. You can reopen this page from the privacy button.'
+    body: 'Turn the camera off at any time with Stop camera, which brings you back to this page.'
   }
 ]
 const disclaimer =
@@ -57,7 +57,7 @@ const consentLine = 'I understand what Aurae reads and sends, and I want to star
 const sitNote =
   'Sit comfortably and face the camera in soft, even light. Readings appear after a few seconds of stillness.'
 
-// Only readings the app actually requests (useVitals: breathingMetrics + cardioMetrics)
+// Only readings the app actually requests (useVitals: requestedMetrics)
 const readings = [
   { label: 'Pulse', unit: 'bpm', family: 'verdant', art: 'orbit' },
   { label: 'Breathing rate', unit: '/ min', family: 'champagne', art: 'helix' },

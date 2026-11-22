@@ -55,7 +55,10 @@ export function useVitals(): UseVitals {
       // requested an arterial-pressure trace, whose model isn't bundled with the SDK and was
       // fetched from Presage at start-up ("Falling back to remote delivery"), plus breathing
       // amplitude, apnea and others that Aurae neither displays nor discloses.
-      requestedMetrics: [MetricType.PULSE_RATE, MetricType.HRV, MetricType.BREATHING_RATE]
+      requestedMetrics: [MetricType.PULSE_RATE, MetricType.HRV, MetricType.BREATHING_RATE],
+      // No usage statistics to Presage: the consent screen says Aurae sends nothing beyond
+      // the camera data needed for the readings
+      enableTelemetry: false
     })
     s.on('streamAvailable', (st) => {
       stream.value = st

@@ -29,7 +29,11 @@ export const softSpring = { stiffness: 40, damping: 16 }
 export function enter(
   index: number,
   reduced: boolean | null
-): { initial: false | { opacity: number; y: number }; animate: { opacity: number; y: number }; transition: object } {
+): {
+  initial: false | { opacity: number; y: number }
+  animate: { opacity: number; y: number }
+  transition: object
+} {
   return {
     initial: reduced ? false : { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },

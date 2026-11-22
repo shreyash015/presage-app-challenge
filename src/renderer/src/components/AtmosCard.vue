@@ -109,8 +109,8 @@ const staticDots = computed(() => drawn.dots.filter((d) => d.tone !== 'signal' |
     <div class="card__value" aria-hidden="true">
       <span class="t-metric">
         <template v-if="shown == null">–&thinsp;–</template>
-        <template v-else>{{ shown }}</template>
-      </span><span class="card__unit">{{ unit }}</span>
+        <template v-else>{{ shown }}</template> </span
+      ><span class="card__unit">{{ unit }}</span>
     </div>
     <!-- In the card's flow, between the value and the status: the card grows to fit it -->
     <svg

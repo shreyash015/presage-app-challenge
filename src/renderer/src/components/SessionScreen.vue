@@ -35,7 +35,9 @@ watch(() => props.stream, attach)
 const status = (value: number | undefined, stable: boolean): string =>
   value == null ? 'Waiting for a reading' : stable ? 'Steady signal' : 'Settling'
 
-const anyReading = computed(() => props.pulse != null || props.breathing != null || props.hrv != null)
+const anyReading = computed(
+  () => props.pulse != null || props.breathing != null || props.hrv != null
+)
 const hintText = computed(
   () =>
     props.hint ||
@@ -59,8 +61,13 @@ const hintText = computed(
         </span>
         <span class="controls">
           <span class="chip chip--live"><span class="chip__dot" />Camera on</span>
-          <button type="button" class="btn btn--primary" :disabled="stopping" :aria-busy="stopping"
-            @click="emit('stop')">
+          <button
+            type="button"
+            class="btn btn--primary"
+            :disabled="stopping"
+            :aria-busy="stopping"
+            @click="emit('stop')"
+          >
             {{ stopping ? 'Stopping…' : 'Stop camera' }}
           </button>
         </span>
@@ -82,16 +89,34 @@ const hintText = computed(
 
     <ul class="readings" aria-label="Your readings">
       <li>
-        <AtmosCard label="Pulse" unit="bpm" family="verdant" art="orbit" :value="pulse"
-          :status="status(pulse, stable.pulse)" />
+        <AtmosCard
+          label="Pulse"
+          unit="bpm"
+          family="verdant"
+          art="orbit"
+          :value="pulse"
+          :status="status(pulse, stable.pulse)"
+        />
       </li>
       <li>
-        <AtmosCard label="Breathing rate" unit="/ min" family="champagne" art="helix" :value="breathing"
-          :status="status(breathing, stable.breathing)" />
+        <AtmosCard
+          label="Breathing rate"
+          unit="/ min"
+          family="champagne"
+          art="helix"
+          :value="breathing"
+          :status="status(breathing, stable.breathing)"
+        />
       </li>
       <li>
-        <AtmosCard label="Heart-rate variability" unit="ms" family="dusk" art="arcs" :value="hrv"
-          :status="status(hrv, stable.hrv)" />
+        <AtmosCard
+          label="Heart-rate variability"
+          unit="ms"
+          family="dusk"
+          art="arcs"
+          :value="hrv"
+          :status="status(hrv, stable.hrv)"
+        />
       </li>
     </ul>
   </main>
@@ -241,7 +266,7 @@ const hintText = computed(
     grid-template-rows: repeat(3, minmax(0, 1fr));
   }
 
-  .readings>li {
+  .readings > li {
     min-height: 0;
   }
 }

@@ -53,7 +53,8 @@ const lit = new Map<number, number>()
 // Smooth 0→1 curve, so brightness falls off softly towards the edge of the circle
 const smooth = (x: number): number => x * x * (3 - 2 * x)
 // Tiny fixed per-dot variation, so the glow looks like real LEDs rather than a perfect disc
-const variety = (key: number): number => 0.8 + 0.2 * ((Math.sin(key * 12.9898) * 43758.5453) % 1 + 1) % 1
+const variety = (key: number): number =>
+  0.8 + ((0.2 * (((Math.sin(key * 12.9898) * 43758.5453) % 1) + 1)) % 1)
 
 function resize(): void {
   const el = canvas.value
