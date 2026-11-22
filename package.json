@@ -5,6 +5,7 @@
   "description": "Calm, camera-based pulse, breathing and heart-rate variability readings, powered by Presage SmartSpectra",
   "main": "./out/main/index.js",
   "author": "Shreyash Payasam",
+  "license": "MIT",
   "homepage": "https://github.com/shreyash015/presage-app-challenge",
   "scripts": {
     "format": "prettier --write .",
