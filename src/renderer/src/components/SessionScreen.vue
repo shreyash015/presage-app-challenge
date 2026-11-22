@@ -59,13 +59,8 @@ const hintText = computed(
         </span>
         <span class="controls">
           <span class="chip chip--live"><span class="chip__dot" />Camera on</span>
-          <button
-            type="button"
-            class="btn btn--primary"
-            :disabled="stopping"
-            :aria-busy="stopping"
-            @click="emit('stop')"
-          >
+          <button type="button" class="btn btn--primary" :disabled="stopping" :aria-busy="stopping"
+            @click="emit('stop')">
             {{ stopping ? 'Stopping…' : 'Stop camera' }}
           </button>
         </span>
@@ -87,34 +82,16 @@ const hintText = computed(
 
     <ul class="readings" aria-label="Your readings">
       <li>
-        <AtmosCard
-          label="Pulse"
-          unit="bpm"
-          family="verdant"
-          art="orbit"
-          :value="pulse"
-          :status="status(pulse, stable.pulse)"
-        />
+        <AtmosCard label="Pulse" unit="bpm" family="verdant" art="orbit" :value="pulse"
+          :status="status(pulse, stable.pulse)" />
       </li>
       <li>
-        <AtmosCard
-          label="Breathing rate"
-          unit="/ min"
-          family="champagne"
-          art="helix"
-          :value="breathing"
-          :status="status(breathing, stable.breathing)"
-        />
+        <AtmosCard label="Breathing rate" unit="/ min" family="champagne" art="helix" :value="breathing"
+          :status="status(breathing, stable.breathing)" />
       </li>
       <li>
-        <AtmosCard
-          label="Heart-rate variability"
-          unit="ms"
-          family="dusk"
-          art="arcs"
-          :value="hrv"
-          :status="status(hrv, stable.hrv)"
-        />
+        <AtmosCard label="Heart-rate variability" unit="ms" family="dusk" art="arcs" :value="hrv"
+          :status="status(hrv, stable.hrv)" />
       </li>
     </ul>
   </main>
@@ -133,6 +110,7 @@ const hintText = computed(
   display: grid;
   grid-template-columns: minmax(0, 1fr);
 }
+
 @media (min-width: 1024px) {
   .session {
     height: 100dvh;
@@ -152,28 +130,33 @@ const hintText = computed(
   grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: var(--s-4);
 }
+
 @media (min-width: 1024px) {
   .hero {
     min-height: 0;
     padding: var(--s-8);
   }
 }
+
 .cam {
   position: absolute;
   inset: 0;
   z-index: -1;
 }
+
 .cam video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transform: scaleX(-1); /* mirrored, like a mirror */
+  transform: scaleX(-1);
+  /* mirrored, like a mirror */
   filter: grayscale(1) contrast(1.06) brightness(1.05);
   opacity: 0.92;
-  -webkit-mask-image: radial-gradient(ellipse 46% 62% at 58% 46%, #000 40%, transparent 88%);
-  mask-image: radial-gradient(ellipse 46% 62% at 58% 46%, #000 40%, transparent 88%);
+  /* -webkit-mask-image: radial-gradient(ellipse 46% 62% at 58% 46%, #000 40%, transparent 88%);
+  mask-image: radial-gradient(ellipse 46% 62% at 58% 46%, #000 40%, transparent 88%); */
 }
+
 /* fade into the panel at the bottom, so the hint and note sit on a calm ground */
 .cam::after {
   content: '';
@@ -190,35 +173,43 @@ const hintText = computed(
   gap: var(--s-4);
   flex-wrap: wrap;
 }
+
 .controls {
   display: inline-flex;
   align-items: center;
   gap: var(--s-3);
 }
+
 .chip--live .chip__dot {
   background: var(--c-signal);
   box-shadow: 0 0 0 1px var(--c-signal-edge);
 }
+
 .hero__title {
   margin: 0;
 }
+
 .hero__foot {
   grid-row: 4;
   display: grid;
   gap: var(--s-2);
   max-width: 46ch;
 }
+
 .hero__hint {
   margin: 0;
-  min-height: 1.55em; /* reserved: no shift when the hint changes */
+  min-height: 1.55em;
+  /* reserved: no shift when the hint changes */
   color: var(--c-ink);
   font-weight: 500;
 }
+
 .hero__error {
   margin: 0;
   color: var(--c-notice);
   font-weight: 500;
 }
+
 .hero__note {
   margin: 0;
   color: var(--c-ink-3);
@@ -235,11 +226,13 @@ const hintText = computed(
   grid-template-columns: minmax(0, 1fr);
   min-height: 0;
 }
+
 @media (min-width: 640px) and (max-width: 1023px) {
   .readings {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
 /* Wide windows: the three cards share the column height equally. If that is less than their
    natural height, each card's drawing shrinks evenly (AtmosCard's art is flex-shrinkable),
    so all three readings stay on screen without scrolling. */
@@ -247,7 +240,8 @@ const hintText = computed(
   .readings {
     grid-template-rows: repeat(3, minmax(0, 1fr));
   }
-  .readings > li {
+
+  .readings>li {
     min-height: 0;
   }
 }
