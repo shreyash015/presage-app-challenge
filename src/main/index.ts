@@ -2,8 +2,51 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { session } from 'electron' // add to the existing electron import
-import { bindSmartSpectraIpc } from '@smartspectra/node-sdk/main'
+import { session } from 'electron'
+import { bindSmartSpectraIpc, SmartSpectraSDK } from '@smartspectra/node-sdk/main'
+
+/*
+ * Clean quit while the SDK is (or was) running.
+ *
+ * Closing the window makes the SDK tear its native session down on a worker thread, and that
+ * thread reports back to JavaScript when it finishes. If the app exits before then, the report
+ * arrives while Node is shutting down and the process aborts ("FATAL ERROR ... napi_throw").
+ * So on quit we close the windows first, wait for every SDK teardown to finish, then exit.
+ *
+ * The SDK's IPC glue (bindSmartSpectraIpc) starts these teardowns itself and does not expose
+ * them, so we observe destroy() to know what to wait for. Its behaviour is unchanged.
+ */
+const pendingTeardowns = new Set<Promise<void>>()
+const sdkDestroy = SmartSpectraSDK.prototype.destroy
+SmartSpectraSDK.prototype.destroy = function (this: SmartSpectraSDK): Promise<void> {
+  const done = sdkDestroy.call(this)
+  pendingTeardowns.add(done)
+  done.catch(() => {}).finally(() => pendingTeardowns.delete(done))
+  return done
+}
+
+const QUIT_WAIT_LIMIT_MS = 8000 // never hang on quit if a teardown stalls
+let teardownFinished = false
+
+app.on('before-quit', (event) => {
+  if (teardownFinished) return
+  event.preventDefault()
+  void (async () => {
+    for (const w of BrowserWindow.getAllWindows()) w.destroy()
+    // Let the closed windows' SDK connections notice and start their teardowns
+    await new Promise((r) => setTimeout(r, 100))
+    const limit = new Promise((r) => setTimeout(r, QUIT_WAIT_LIMIT_MS))
+    while (pendingTeardowns.size > 0) {
+      const settled = await Promise.race([
+        Promise.allSettled([...pendingTeardowns]).then(() => true),
+        limit.then(() => false)
+      ])
+      if (!settled) break
+    }
+    teardownFinished = true
+    app.quit()
+  })()
+})
 
 function createWindow(): void {
   // Create the browser window.
