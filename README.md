@@ -1,3 +1,5 @@
+[![Aurae: Calm Camera-Based Vitals](https://repoclip.io/api/badge/e3e7457b-7fce-4f38-85c6-c65b8212edaa)](https://repoclip.io/v/e3e7457b-7fce-4f38-85c6-c65b8212edaa)
+
 # presage-app
 
 An Electron application with Vue and TypeScript
