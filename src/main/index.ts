@@ -1,9 +1,29 @@
+// Tells the SmartSpectra SDK where its native library is in a packaged app
+import './nativeRuntime'
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { session } from 'electron'
-import { bindSmartSpectraIpc, SmartSpectraSDK } from '@smartspectra/node-sdk/main'
+
+/*
+ * The SDK loads its native library as soon as it is imported. The bundler moves static
+ * imports of packages above everything else, which would run before nativeRuntime has set
+ * the library path, so the SDK is imported on demand (loadSmartSpectra) instead.
+ */
+type SmartSpectraMain = typeof import('@smartspectra/node-sdk/main')
+let smartSpectra: SmartSpectraMain | null = null
+
+async function loadSmartSpectra(): Promise<void> {
+  try {
+    smartSpectra = await import('@smartspectra/node-sdk/main')
+  } catch (e) {
+    // The window still opens; starting the camera then fails with an error message there
+    console.error('Aurae: SmartSpectra SDK failed to load', e)
+    return
+  }
+  watchTeardowns(smartSpectra.SmartSpectraSDK)
+}
 
 /*
  * Clean quit while the SDK is (or was) running.
@@ -17,12 +37,14 @@ import { bindSmartSpectraIpc, SmartSpectraSDK } from '@smartspectra/node-sdk/mai
  * them, so we observe destroy() to know what to wait for. Its behaviour is unchanged.
  */
 const pendingTeardowns = new Set<Promise<void>>()
-const sdkDestroy = SmartSpectraSDK.prototype.destroy
-SmartSpectraSDK.prototype.destroy = function (this: SmartSpectraSDK): Promise<void> {
-  const done = sdkDestroy.call(this)
-  pendingTeardowns.add(done)
-  done.catch(() => {}).finally(() => pendingTeardowns.delete(done))
-  return done
+function watchTeardowns(SDK: SmartSpectraMain['SmartSpectraSDK']): void {
+  const sdkDestroy = SDK.prototype.destroy
+  SDK.prototype.destroy = function (this: InstanceType<typeof SDK>): Promise<void> {
+    const done = sdkDestroy.call(this)
+    pendingTeardowns.add(done)
+    done.catch(() => {}).finally(() => pendingTeardowns.delete(done))
+    return done
+  }
 }
 
 const QUIT_WAIT_LIMIT_MS = 8000 // never hang on quit if a teardown stalls
@@ -64,7 +86,7 @@ function createWindow(): void {
       sandbox: false
     }
   })
-  bindSmartSpectraIpc(mainWindow)
+  smartSpectra?.bindSmartSpectraIpc(mainWindow)
 
   session.defaultSession.setPermissionRequestHandler((wc, permission, cb, details) => {
     const url = details?.requestingUrl || wc.getURL()
@@ -93,9 +115,11 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  await loadSmartSpectra()
+
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.shreyash.aurae')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

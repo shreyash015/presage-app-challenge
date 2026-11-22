@@ -1,10 +1,11 @@
 {
-  "name": "presage-app",
+  "name": "aurae",
+  "productName": "Aurae",
   "version": "1.0.0",
-  "description": "An Electron application with Vue and TypeScript",
+  "description": "Calm, camera-based pulse, breathing and heart-rate variability readings, powered by Presage SmartSpectra",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Shreyash Payasam",
+  "homepage": "https://github.com/shreyash015/presage-app-challenge",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
