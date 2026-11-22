@@ -1,6 +1,7 @@
 import { ref, shallowRef, watch, onMounted, onBeforeUnmount, type Ref, type ShallowRef } from 'vue'
 import { SmartSpectraSDK, MetricType } from '@smartspectra/node-sdk/renderer'
 import { decodeMetrics } from '@smartspectra/node-sdk/messages'
+import { sdkProblem } from './errorMessages'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const last = (arr?: any[] | null): any => (arr?.length ? arr[arr.length - 1] : undefined)
@@ -76,7 +77,9 @@ export function useVitals(): UseVitals {
     s.on('validationStatus', (_c, _t, h) => (hint.value = h))
     s.on('error', (code, msg) => {
       console.error('SmartSpectra', code, msg)
-      error.value = msg
+      // Plain language for known problems; the session screen adds "Stop the camera and try again."
+      const p = sdkProblem(code, msg)
+      error.value = p ? `${p.what} ${p.fix}` : msg
     })
     sdk.value = s
   })
