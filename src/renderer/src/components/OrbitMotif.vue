@@ -183,8 +183,16 @@ const soft = { duration: duration.calm, ease: ease.outSoft }
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(closest-side, color-mix(in srgb, var(--c-signal) 8%, transparent), transparent 45%),
-    radial-gradient(closest-side, color-mix(in srgb, var(--c-champagne) 50%, transparent), transparent 100%);
+    radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--c-signal) 8%, transparent),
+      transparent 45%
+    ),
+    radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--c-champagne) 50%, transparent),
+      transparent 100%
+    );
 }
 .orbit__svg {
   display: block;

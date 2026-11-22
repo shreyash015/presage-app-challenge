@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import ConsentScreen from './components/ConsentScreen.vue'
 import SessionScreen from './components/SessionScreen.vue'
 import { useVitals } from './composables/useVitals'
+import { startProblem } from './composables/errorMessages'
 
 const consented = ref(false)
 const startError = ref<string | null>(null)
@@ -19,8 +20,9 @@ async function onAccept(): Promise<void> {
     consented.value = true
   } catch (e) {
     console.error('Aurae: camera start failed', e)
-    startError.value =
-      'Aurae couldn’t start the camera. Allow camera access for Aurae in System Settings › Privacy & Security › Camera, then try again.'
+    // Say what actually went wrong (permission, no camera, camera busy, API key, network…)
+    const { what, fix } = startProblem(e)
+    startError.value = `${what} ${fix} Then try again.`
   }
 }
 
@@ -39,13 +41,7 @@ async function onStop(): Promise<void> {
 </script>
 
 <template>
-  <!-- "Not now" (decline) has no destination yet, so it leaves the consent screen in place -->
-  <ConsentScreen
-    v-if="!consented"
-    :error="startError"
-    @accept="onAccept"
-    @decline="consented = false"
-  />
+  <ConsentScreen v-if="!consented" :error="startError" @accept="onAccept" />
   <SessionScreen
     v-else
     :stream="stream"

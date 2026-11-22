@@ -49,7 +49,9 @@ const f = (n: number): string => (Math.round(n * 100) / 100).toString()
 /** Cubic Hermite → Bézier path of a function y(t), x(t) = X0 + W·t. */
 function curve(y: (t: number) => number): string {
   const eps = 1e-4
-  const dy = (t: number): number => (y(Math.min(1, t + eps)) - y(Math.max(0, t - eps))) / (Math.min(1, t + eps) - Math.max(0, t - eps))
+  const dy = (t: number): number =>
+    (y(Math.min(1, t + eps)) - y(Math.max(0, t - eps))) /
+    (Math.min(1, t + eps) - Math.max(0, t - eps))
   let d = `M${f(X0)} ${f(y(0))}`
   for (let s = 0; s < SEGMENTS; s++) {
     const a = s / SEGMENTS
@@ -78,7 +80,8 @@ function pulse(): Drawing {
     const a = 10 + 6.4 * i // wide amplitude spread, so the six curves open into a lens
     const phi = -0.62 + 0.27 * i
     const y = (t: number): number =>
-      lerp(yStart, yEnd, smoothstep(t)) - a * Math.sin(Math.PI * t) * Math.sin(3 * Math.PI * t + phi)
+      lerp(yStart, yEnd, smoothstep(t)) -
+      a * Math.sin(Math.PI * t) * Math.sin(3 * Math.PI * t + phi)
     return { d: curve(y), opacity: 0.84 - i * 0.08 }
   })
   return {

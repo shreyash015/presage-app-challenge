@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: presage-app
+appId: com.shreyash.aurae
+productName: Aurae
 directories:
   buildResources: build
 files:
@@ -9,31 +9,42 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  # SmartSpectra's native libraries for every platform: each build ships only its own copy,
+  # via extraResources below (macOS can't load native libraries from inside app.asar)
+  - '!node_modules/@smartspectra/node-sdk-*-*/**'
 asarUnpack:
   - resources/**
 win:
-  executableName: presage-app
+  extraResources:
+    - from: node_modules/@smartspectra/node-sdk-win32-${arch}/
+      to: smartspectra/
+  executableName: aurae
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
+  extraResources:
+    - from: node_modules/@smartspectra/node-sdk-darwin-${arch}/
+      to: smartspectra/
+  entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist
+  # Aurae only uses the camera; it asks for no microphone or folder access
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+    NSCameraUsageDescription: Aurae uses your camera to measure your pulse, breathing rate and heart-rate variability.
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  extraResources:
+    - from: node_modules/@smartspectra/node-sdk-linux-${arch}/
+      to: smartspectra/
   target:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: Shreyash Payasam
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}

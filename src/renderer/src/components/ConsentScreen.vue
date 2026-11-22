@@ -3,10 +3,10 @@
  * ConsentScreen — shown before the camera turns on (Aurae v2 design system, design/tokens.css).
  *
  *   - emits `accept` only when the consent box is ticked
- *   - emits `decline` from "Not now"
+ *   - "Not now" keeps the camera off and says so (nothing else happens; there is no other screen)
  *   - never touches the camera or the SDK itself; the parent starts the camera and, if that
  *     fails, passes the message back through the `error` prop
- * Disclosure text is unchanged from the original screen (proposed corrections await approval).
+ * Disclosure text must match what the app does (requested metrics, telemetry off, nothing saved).
  */
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { motion, useReducedMotion } from 'motion-v'
@@ -15,7 +15,7 @@ import AtmosCard from './AtmosCard.vue'
 import LedDots from './LedDots.vue'
 import { enter } from '../design/motion'
 
-const emit = defineEmits<{ accept: []; decline: [] }>()
+const emit = defineEmits<{ accept: [] }>()
 
 /**
  * Optional: the parent passes `error` if starting the camera fails (e.g. permission denied).
@@ -27,27 +27,28 @@ const reduce = useReducedMotion()
 const agreed = ref(false)
 const needTick = ref(false)
 const starting = ref(false)
+const declined = ref(false)
 const checkbox = ref<HTMLInputElement | null>(null)
 
-// ---- Disclosures (unchanged from the original screen) ----
+// ---- Disclosures: keep in step with useVitals.ts (metrics, enableTelemetry) ----
 const lead =
-  'Aurae turns signals from your camera into the shapes and colours on this screen. Here is exactly what that means.'
+  'Aurae turns signals from your camera into the readings on this screen. Here is exactly what that means.'
 const sections = [
   {
     title: 'What Aurae reads',
-    body: 'Your pulse, breathing rate, heart-rate variability and blinks, measured from small changes in your face on camera.'
+    body: 'Your pulse, breathing rate and heart-rate variability, measured from small changes in your face on camera.'
   },
   {
     title: 'What leaves this device',
-    body: 'Camera frames are sent to Presage’s SmartSpectra service, which returns the readings. Aurae sends nothing else.'
+    body: 'Data from your camera is sent to Presage’s SmartSpectra service, which calculates the readings. Aurae sends nothing else.'
   },
   {
     title: 'What Aurae keeps',
-    body: 'Nothing. Readings live in memory while the app is open and are gone when you close it. No video or images are saved.'
+    body: 'Nothing. Readings are shown only while the camera is on and are cleared when you stop it. No readings, video or images are saved.'
   },
   {
     title: 'You’re in control',
-    body: 'Turn the camera off at any time with the camera button. You can reopen this page from the privacy button.'
+    body: 'Turn the camera off at any time with Stop camera, which brings you back to this page.'
   }
 ]
 const disclaimer =
@@ -56,7 +57,7 @@ const consentLine = 'I understand what Aurae reads and sends, and I want to star
 const sitNote =
   'Sit comfortably and face the camera in soft, even light. Readings appear after a few seconds of stillness.'
 
-// Only readings the app actually requests (useVitals: breathingMetrics + cardioMetrics)
+// Only readings the app actually requests (useVitals: requestedMetrics)
 const readings = [
   { label: 'Pulse', unit: 'bpm', family: 'verdant', art: 'orbit' },
   { label: 'Breathing rate', unit: '/ min', family: 'champagne', art: 'helix' },
@@ -75,8 +76,14 @@ function onTurnOn(): void {
   checkbox.value?.focus()
 }
 watch(agreed, (v) => {
-  if (v) needTick.value = false
+  if (v) needTick.value = declined.value = false
 })
+// "Not now": the camera stays off; untick the box and confirm that nothing happened
+function onNotNow(): void {
+  agreed.value = false
+  needTick.value = false
+  declined.value = true
+}
 // A start failure reported by the parent ends the "Starting camera…" state
 watch(
   () => props.error,
@@ -135,11 +142,7 @@ onBeforeUnmount(() => ro?.disconnect())
     </motion.section>
 
     <!-- ============ Consent: the decision ============ -->
-    <motion.section
-      v-bind="enter(1, reduce)"
-      class="consent panel"
-      aria-labelledby="consent-title"
-    >
+    <motion.section v-bind="enter(1, reduce)" class="consent panel" aria-labelledby="consent-title">
       <!-- Named region; when it scrolls, Tab reaches it and arrow/Page keys scroll it -->
       <div
         ref="body"
@@ -181,10 +184,19 @@ onBeforeUnmount(() => ro?.disconnect())
           <span class="t-body">{{ consentLine }}</span>
         </label>
         <!-- One message slot, reserved height: no layout shift when it appears -->
-        <p id="need-tick" class="need t-label" :class="{ 'need--error': error }" role="status" aria-live="polite">
+        <p
+          id="need-tick"
+          class="need t-label"
+          :class="{ 'need--error': error, 'need--calm': declined && !error && !needTick }"
+          role="status"
+          aria-live="polite"
+        >
           <Transition name="notice">
             <span v-if="error" key="e">{{ error }}</span>
             <span v-else-if="needTick" key="t">Tick the box above to turn on the camera.</span>
+            <span v-else-if="declined" key="d">
+              No problem. Your camera stays off, and nothing has been read or sent.
+            </span>
           </Transition>
         </p>
         <div class="actions">
@@ -200,16 +212,19 @@ onBeforeUnmount(() => ro?.disconnect())
             <span v-if="starting" class="spinner" aria-hidden="true" />
             {{ starting ? 'Starting camera…' : 'Turn on camera' }}
           </button>
-          <button type="button" class="btn" :disabled="starting" @click="emit('decline')">
-            Not now
-          </button>
+          <button type="button" class="btn" :disabled="starting" @click="onNotNow">Not now</button>
         </div>
       </div>
     </motion.section>
 
     <!-- ============ Preview of what the camera unlocks ============ -->
     <ul class="cards" aria-label="Readings Aurae will show">
-      <motion.li v-for="(r, i) in readings" :key="r.label" v-bind="enter(2 + i, reduce)" class="cards__item">
+      <motion.li
+        v-for="(r, i) in readings"
+        :key="r.label"
+        v-bind="enter(2 + i, reduce)"
+        class="cards__item"
+      >
         <AtmosCard :label="r.label" :unit="r.unit" :family="r.family" :art="r.art" />
       </motion.li>
     </ul>
@@ -448,6 +463,9 @@ onBeforeUnmount(() => ro?.disconnect())
   margin-top: var(--s-1);
   max-width: 52ch;
   line-height: 1.45;
+}
+.need--calm {
+  color: var(--c-ink-2);
 }
 .notice-enter-active {
   transition:
