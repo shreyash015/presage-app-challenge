@@ -9,6 +9,7 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!docs/**'
   # SmartSpectra's native libraries for every platform: each build ships only its own copy,
   # via extraResources below (macOS can't load native libraries from inside app.asar)
   - '!node_modules/@smartspectra/node-sdk-*-*/**'
