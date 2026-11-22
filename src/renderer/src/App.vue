@@ -39,13 +39,7 @@ async function onStop(): Promise<void> {
 </script>
 
 <template>
-  <!-- "Not now" (decline) has no destination yet, so it leaves the consent screen in place -->
-  <ConsentScreen
-    v-if="!consented"
-    :error="startError"
-    @accept="onAccept"
-    @decline="consented = false"
-  />
+  <ConsentScreen v-if="!consented" :error="startError" @accept="onAccept" />
   <SessionScreen
     v-else
     :stream="stream"
